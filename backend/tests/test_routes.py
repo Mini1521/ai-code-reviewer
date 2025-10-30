@@ -2,9 +2,9 @@ import requests
 import json
 import time
 
-BASE_URL = "http://127.0.0.1:5000"
+BASE_URL = "http://127.0.0.1:5000"      #base URL for the Flask backend
 
-samples = [
+samples = [                             #to test the review system ,sample code in multiple languages 
     {
         "language": "Python",
         "code": "def add(a, b):\n    return a + b"
@@ -24,32 +24,25 @@ samples = [
 ]
 
 
-def post_review(sample):
-    print(f"🔹 Sending review request for {sample['language']} code...")
+def post_review(sample):                #function to create new review
+    print(f" Sending review request for {sample['language']} code...")
     response = requests.post(f"{BASE_URL}/api/review", json=sample)
     print(f"Status: {response.status_code}")
     try:
         print(json.dumps(response.json(), indent=2))
     except:
         print(response.text)
-    time.sleep(2)  # slight delay to avoid rate limits
+    time.sleep(2)                       # slight delay to avoid rate limits
 
 
-def get_all_reviews():
-    print("\n🔹 Fetching all reviews...")
+def get_all_reviews():                  #function to get all reviews and display them
+    print("\n Fetching all reviews...")
     response = requests.get(f"{BASE_URL}/api/reviews")
     print(f"Status: {response.status_code}")
     print(json.dumps(response.json(), indent=2))
 
-
-if __name__ == "__main__":
-    print("🚀 Starting multi-language review test...\n")
-    for s in samples:
-        post_review(s)
-    get_all_reviews()
-
-def test_delete_review(review_id):
-    print(f"\n🔹 Deleting review {review_id} ...")
+def test_delete_review(review_id):      #function to delete a single review by ID
+    print(f"\n Deleting review {review_id} ...")
     r = requests.delete(f"{BASE_URL}/api/review/{review_id}")
     print("Status:", r.status_code)
     try:
@@ -57,12 +50,18 @@ def test_delete_review(review_id):
     except:
         print(r.text)
 
+if __name__ == "__main__":              # main function , runs when file is executed
+    print(" Starting multi-language review test...\n")
+    for s in samples:                   #post each sample review and get all reviews after each post
+        post_review(s)
+    get_all_reviews()                   #new reviews are displayed
 
-if __name__ == "__main__":
-    # example: post one review, get all, then delete the last one
+if __name__ == "__main__":              #main function to delete a review by ID
     post_review({"language":"Python","code":"def add(a,b): return a+b"})
     get_all_reviews()
-    # change id to the one you want to delete or parse previous response to get id
-    test_delete_review(5)
+    test_delete_review(5)               #change id to the one you want to delete or parse previous response to get id
     get_all_reviews()
 
+#--- To delete all reviews, uncomment below ---#
+# requests.delete(f"{BASE_URL}/api/reviews")
+# print("\n Deleting all reviews ...")

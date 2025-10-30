@@ -1,115 +1,107 @@
+//event listener added to the form submission
 document.getElementById('review-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  //get form values
   const language = document.getElementById('language').value;
   const code = document.getElementById('code').value;
   const resultBox = document.getElementById('result-box');
   const reviewText = document.getElementById('review-text');
   const score = document.getElementById('score');
 
-  if (!language || !code.trim()) {
+  if (!language || !code.trim()) { //simple validation to make sureboth feid are filled 
     alert('Please select a language and enter your code.');
     return;
   }
 
-  try {
-    //await clearOldReview();
-    // Show loading text immediately
+  try { //loading message shown while waiting for backend to respond
     reviewText.textContent = "Analyzing your code... please wait.";
     resultBox.classList.remove('hidden');
     score.textContent = "";
 
-    // Send the request to backend
+    //requesrt sent to the backend server (Flask API)
     const response = await fetch('http://127.0.0.1:5000/api/review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ language, code })
     });
 
-    if (!response.ok) {
+    if (!response.ok) { //error thorwn if server fails to respond
       throw new Error(`Server responded with status ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json(); //backend JSON response parsed 
     console.log("✅ Review API Response:", data);
 
-    // Ensure we got proper data
+    // ensure backend returns a valid review text
     if (!data.review_text) {
       reviewText.textContent = "No feedback received from server.";
       return;
     }
 
-    // ✅ Show review results first
-    reviewText.innerHTML = marked.parse(data.review_text);
-    score.textContent = `Code Quality Score: ${data.score}/10`;
-    resultBox.classList.remove('hidden');
-    resultBox.scrollIntoView({ behavior: 'smooth' });
+    reviewText.innerHTML = marked.parse(data.review_text);  //review displayed using markdown parser
+    score.textContent = `Code Quality Score: ${data.score}/10`;  //display score calculated
+    resultBox.classList.remove('hidden');    //result box made visible
+    resultBox.scrollIntoView({ behavior: 'smooth' }); //scoll to the review area, smoothly
 
-  //   After displaying review result:
-    // setTimeout(() => {
-    //   loadHistory();
-    // }, 5000); // wait 5 seconds before loading history
+   loadHistory(); //load all reviews below, after showing results
 
-   loadHistory();
-
-    // Save the latest review to localStorage
-    // await saveLastReview(data);
-
-
-  } catch (error) {
+  } catch (error) { //backend errors handled
     console.error("Error connecting to backend:", error);
     alert("There was an error connecting to the backend. Check if Flask is running.");
   }
 });
 
+//function to laod history of previous code reviews
 async function loadHistory() {
-  const response = await fetch("http://127.0.0.1:5000/api/reviews");
+  const response = await fetch("http://127.0.0.1:5000/api/reviews"); //backend route to return all reviews called
   const data = await response.json();
 
-  const historyContainer = document.getElementById("history");
-  historyContainer.innerHTML = "";
+  const historyContainer = document.getElementById("history"); //container to show all history
+  historyContainer.innerHTML = ""; //any old content cleared
 
-  if (!Array.isArray(data) || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) { //shows a simple message, if noe reviews yet
     historyContainer.innerHTML = "<p>No previous reviews found.</p>";
     return;
   }
 
-  // group by language
+  //group by the reviews by programming language
   const grouped = {};
   data.forEach(review => {
     if (!grouped[review.language]) grouped[review.language] = [];
     grouped[review.language].push(review);
   });
 
+  //sections created for each language
   for (const [language, reviews] of Object.entries(grouped)) {
-    const langSection = document.createElement("details");
+    const langSection = document.createElement("details"); //collapsible section created 
     langSection.classList.add("language-section");
 
-    const langSummary = document.createElement("summary");
+    const langSummary = document.createElement("summary"); //summary
     langSummary.textContent = `${language} (${reviews.length} reviews)`;
     langSection.appendChild(langSummary);
 
-    // add each review
-    reviews.forEach(review => {
+    reviews.forEach(review => { //HTML elements created for each review
       const details = document.createElement("details");
       details.classList.add("history-item");
 
-      const summary = document.createElement("summary");
+      const summary = document.createElement("summary"); //summary for each review 
       summary.textContent = `Review #${review.id} | Score: ${review.score}/10 | ${new Date(review.created_at).toLocaleString()}`;
 
-      const content = document.createElement("div");
+      const content = document.createElement("div"); //actual contecnt inside 
       content.classList.add("review-content");
       content.innerHTML = `
         <pre><code>${review.code}</code></pre>
         <div class="review-text">${marked.parse(review.review_text)}</div>
       `;
 
-      // Delete button
-      const deleteBtn = document.createElement("button");
+      const deleteBtn = document.createElement("button"); //delete button created for each review 
       deleteBtn.textContent = "Delete";
       deleteBtn.classList.add("delete-btn");
+
+      //delete button functionality
       deleteBtn.addEventListener("click", async (ev) => {
-        ev.stopPropagation(); // prevent toggling the details element
+        ev.stopPropagation(); //prevent toggling the details element
         if (!confirm(`Delete Review #${review.id}? This cannot be undone.`)) return;
 
         try {
@@ -117,8 +109,7 @@ async function loadHistory() {
             method: "DELETE"
           });
 
-          if (delResp.ok) {
-            // refresh history after successful delete
+          if (delResp.ok) { //reload the list if deletion is successful 
             await loadHistory();
           } else {
             const err = await delResp.json().catch(() => ({}));
@@ -130,77 +121,33 @@ async function loadHistory() {
         }
       });
 
-      // append in order: summary -> (content + delete)
-      details.appendChild(summary);
-      // place delete button in the content area (or anywhere you prefer)
+      details.appendChild(summary); //append summary to details
       content.appendChild(deleteBtn);
       details.appendChild(content);
       langSection.appendChild(details);
     });
 
-    historyContainer.appendChild(langSection);
+    historyContainer.appendChild(langSection); //finished section added to the page
   }
 }
 
-
-// document.getElementById("load-history-btn").addEventListener("click", () => {
-//   loadHistory();
-//   document.getElementById("history-section").scrollIntoView({ behavior: "smooth" });
-// });
-
-
-// === 🧠 Restore last review on reload ===
-// document.addEventListener("DOMContentLoaded", () => {
-//   const lastReview = localStorage.getItem("lastReview");
-//   if (lastReview) {
-//     const data = JSON.parse(lastReview);
-//     const resultBox = document.getElementById("result-box");
-//     const reviewText = document.getElementById("review-text");
-//     const score = document.getElementById("score");
-
-//     reviewText.innerHTML = marked.parse(data.review_text);
-//     score.textContent = ` Code Quality Score: ${data.score}/10`;
-//     resultBox.classList.remove("hidden");
-//   }
-// });
-
-// === 🧹 Clean start on page load (do NOT restore previous review) ===
+//page restes when first loaded
 document.addEventListener("DOMContentLoaded", () => {
-  // Remove any previously saved review from localStorage
-  localStorage.removeItem("lastReview");
+  localStorage.removeItem("lastReview"); //old local data cleared
 
-  // Hide the review result box for a fresh page
-  const resultBox = document.getElementById("result-box");
+  const resultBox = document.getElementById("result-box"); //main elements
   const reviewText = document.getElementById("review-text");
   const score = document.getElementById("score");
 
-  reviewText.textContent = ""; // clear text
-  score.textContent = "";      // clear score
-  resultBox.classList.add("hidden");
+  reviewText.textContent = ""; //clear text
+  score.textContent = "";      //clear score
+  resultBox.classList.add("hidden"); //hidden until code is reviewd
 });
 
-// });
-// // === 🧹 Hide any saved review on page load (do not restore) ===
-// document.addEventListener("DOMContentLoaded", () => {
-//   localStorage.removeItem("lastReview"); // Clear any previous review
-//   const resultBox = document.getElementById("result-box");
-//   resultBox.classList.add("hidden"); // Keep the review box hidden by default
-// });
-
-
-// // === 💾 Save latest review after receiving it ===
-async function saveLastReview(data) {
-  localStorage.setItem("lastReview", JSON.stringify(data));
-}
-
-
-// ✅ Collapse review box when loading history
+//review box collapses when clicked on load history button
 document.getElementById("load-history-btn").addEventListener("click", () => {
 const resultBox = document.getElementById("result-box");
 resultBox.classList.add("hidden"); // collapse review display
-loadHistory();
+loadHistory(); //review history refreshed
 document.getElementById("history-section").scrollIntoView({ behavior: "smooth" });
 });
-
-
-
