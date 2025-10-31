@@ -70,7 +70,7 @@ Once it starts, Flask will serve both the API and the frontend. The app runs loc
 
 ## Testing the API
 - A test script is included in `backend/tests/test_routes.py`
-- To run `python backenc/tests/test_routes.py`
+- To run `python backend/tests/test_routes.py`
 - This script:
   - Posts sample reviews for multiple languages.
   - Retrieves all reviews.
