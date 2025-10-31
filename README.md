@@ -53,7 +53,33 @@ cd backend
 python app.py
 ```
 Once it starts, Flask will serve both the API and the frontend. The app runs locally on: `http://127.0.0.1:5000/` 
-(You do not need to use VS Code Live Server. The HTML `index.html` is served directly from the Flask backend.)
+*(You do not need to use VS Code Live Server. The HTML `index.html` is served directly from the Flask backend.)*
+
+## API Endpoints
+- POST `/api/review`: Submit code for AI review
+- GET `/api/reviews`: Fetch all stored reviews
+- GET `/api/review/<id>`: Get a specific review by ID
+- DELETE `/api/review/<id>`: Delete a specific review
+
+## Assumptions Made
+- The frontend `index.html` is served from Flask, not opened manually or via Live Server.
+- The OpenAI API key is available and valid in the `.env` file.
+- Users input syntactically valid code.
+- The backend and frontend run locally on the same machine, `http://127.0.0.1:5000/`.
+- SQLite is used for simplicity and requires no manual configuration.
+
+## Testing the API
+- A test script is included in `backend/tests/test_routes.py`
+- To run `python backenc/tests/test_routes.py`
+- This script:
+  - Posts sample reviews for multiple languages.
+  - Retrieves all reviews.
+  - Deletes individual or all reviews (bulk delete for cleanup).
+
+### Time spent on the Project
+Total time spent on the project 10 hours.
+
+
 
 
 
