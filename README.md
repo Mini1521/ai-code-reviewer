@@ -46,6 +46,16 @@ cp backend/.env.example backend/.env
 OPENAI_API_KEY = YOUR_API_KEY
 ```
 
+## How to run the application
+Start the Flask backend
+```
+cd backend 
+python app.py
+```
+Once it starts, Flask will serve both the API and the frontend. The app runs locally on: `http://127.0.0.1:5000/` 
+(You do not need to use VS Code Live Server. The HTML `index.html` is served directly from the Flask backend.)
+
+
 
 
 
