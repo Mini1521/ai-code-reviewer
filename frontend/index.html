@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!--mobile device responsive-->
+  <title>AI Code Reviewer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1> AI Code Reviewer Assisstant </h1>
+    <p>Paste your code below and get instant feedback!</p>
+
+    <form id="review-form">
+      <label for="language">Programming Language:</label> <!--dropdown to select the programming language-->
+      <select id="language" required>
+        <option value="">Select...</option>
+        <option value="Python">Python</option>
+        <option value="JavaScript">JavaScript</option>
+        <option value="C#">C#</option>
+        <option value="C++">C++</option>
+      </select>
+
+      <label for="code">Your Code:</label> <!--area where user enters code-->
+      <textarea id="code" 
+      placeholder="Write or paste your code here..." required></textarea>
+
+      <button type="submit">Submit for Review</button> <!--button triggers the code review process-->
+    </form>
+
+    <div id="result-box" class="hidden"> <!--shown only after code review responce arrives-->
+      <h2> Review Result</h2>
+      <p id="review-text"></p> <!--AI feedback displayes-->
+      <p id="score"></p> <!--AI score displayes-->
+    </div>
+
+    <hr>
+
+    <div id="history-section">
+      <h3>Previous Reviews</h3>
+      <button id="load-history-btn" type="button">
+        Load Review History</button> <!--button calles loadHistory() function in script.js upon being clicked-->
+      <div id="history"></div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script> <!--backend API connection-->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
