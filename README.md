@@ -25,16 +25,26 @@ git clone https://github.com/Mini1521/ai-code-reviewer.git
 cd ai-code-reviewer
 ```
 2. Creating a Virtual Environment
-``` python -m venv venv ```
+``` 
+python -m venv venv 
+```
 3. Activate the Virtual Environment
-``` venv\Scripts\activate ```
+```
+venv\Scripts\activate 
+```
 4. Install Dependencies
-``` pip install -r requirements.txt ```
+``` 
+pip install -r requirements.txt 
+```
 5. Create .env file 
 - Duplicate the `.env.example` file and rename it as `.env`
-``` cp backend/.env.example backend/.env ```
+```
+cp backend/.env.example backend/.env
+```
 - Add OpenAI API key
-``` OPENAI_API_KEY = YOUR_API_KEY ```
+```
+OPENAI_API_KEY = YOUR_API_KEY
+```
 
 
 
