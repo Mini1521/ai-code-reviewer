@@ -76,3 +76,5 @@ Once it starts, Flask will serve both the API and the frontend. The app runs loc
   - Retrieves all reviews.
   - Deletes individual or all reviews (bulk delete for cleanup).
 
+### Demo-Video: [Video] (https://drive.google.com/file/d/1TpNmQ9iapP28IOoDHJWETkq1JQrwNVEs/view?usp=sharing)
+
