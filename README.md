@@ -76,4 +76,3 @@ Once it starts, Flask will serve both the API and the frontend. The app runs loc
   - Retrieves all reviews.
   - Deletes individual or all reviews (bulk delete for cleanup).
 
-### Total time spent on the project: 10 hours.
